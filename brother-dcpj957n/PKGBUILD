@@ -1,0 +1,42 @@
+# Maintainer: Naoya Hayashi <fuzmare@pm.me>
+pkgname=brother-dcpj957n
+pkgver=3.0.0
+pkgrel=1
+pkgdesc="LPR and CUPS driver for Brother DCP-J957N printer"
+arch=("i686" "x86_64")
+url="https://support.brother.com/j/b/producttop.aspx?c=ca&lang=en&prod=dcpj957n"
+license=("EULA")
+groups=("base-devel")
+source=(
+  "https://download.brother.com/welcome/dlf100574/dcpj952nlpr-3.0.0-1.i386.rpm"
+  "https://download.brother.com/welcome/dlf100576/dcpj952ncupswrapper-3.0.0-1.i386.rpm"
+)
+md5sums=(
+  "ae321496a669a43c655ad35e95281e7e"
+  "526b5a1f209ab406adae26d24d57e0ed"
+)
+prepare() {
+#  do not install in '/usr/local'
+	if [ -d $srcdir/usr/local/Brother ]; then
+		install -dm755 "$srcdir/usr/share"
+		mv "$srcdir/usr/local/Brother/" "$srcdir/usr/share/brother"
+		rm -rf "$srcdir/usr/local"
+	        sed -i 's|/usr/local/Brother|/usr/share/brother|g' `grep -lr '/usr/local/Brother' ./`
+        fi
+# setup cups-directories
+	install -dm755 "$srcdir/usr/share/cups/model"
+	install -dm755 "$srcdir/usr/lib/cups/filter"
+# copy ppd and filter file to their destination dirs
+        cd `find . -type d -name 'cupswrapper'`
+        cp *.ppd "$srcdir/usr/share/cups/model/"
+# the relative path,generated on the basis of the caller, does not work in this case
+        cd "$srcdir"
+# get absolute printer path
+        _baseDir="\"/$(find opt -maxdepth 3 -depth -print -quit -type d)\""
+# /etc/printcap is managed by cups
+        rm "$(find $srcdir -type f -name 'setupPrintcap*')"
+}
+package() {
+    cp -R "$srcdir/usr" "$pkgdir"
+    cp -R "$srcdir/opt" "$pkgdir"
+}
