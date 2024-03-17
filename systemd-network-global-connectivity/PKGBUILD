@@ -1,0 +1,21 @@
+# Maintainer: Naoya Hayashi <fuzakebito@fuzake.io>
+pkgname=systemd-network-global-connectivity
+pkgver=0.0.1
+pkgrel=1
+pkgdesc="A service to ensure and verify that 'ip a' lists an address with a global scope."
+arch=('any')
+license=('NYSL')
+package() {
+  mkdir -p "$pkgdir/usr/lib/systemd/system"
+  cat > "$pkgdir/usr/lib/systemd/system/network-global-connectivity.service" <<EOF
+[Unit]
+Description=Wait for network to be configured
+
+[Service]
+Type=forking
+ExecStart=/bin/bash -c 'echo "Started"; while ! ip a | grep -q global; do sleep 1; done; sleep 3; echo "Connection established"'
+
+[Install]
+WantedBy=default.target
+EOF
+}

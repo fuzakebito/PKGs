@@ -1,0 +1,23 @@
+# Maintainer: Naoya Hayashi <fuzakebito@fuzake.io>
+pkgname=systemd-ipsec-l2tp-starter
+pkgver=0.0.1
+pkgrel=1
+pkgdesc="A service to start strongswan ipsec and xl2tpd after network-global-connectivity.service"
+arch=('any')
+license=('NYSL')
+package() {
+  mkdir -p "$pkgdir/usr/lib/systemd/system"
+  cat > "$pkgdir/usr/lib/systemd/system/ipsec-l2tp-starter.service" <<EOF
+[Unit]
+Description=start strongswan ipsec and xl2tpd after network-global-connectivity.service
+After=network-global-connectivity.service
+Requires=strongswan-starter.service xl2tpd.service
+Before=strongswan-starter.service xl2tpd.service
+
+[Service]
+ExecStart="echo"
+
+[Install]
+WantedBy=default.target
+EOF
+}

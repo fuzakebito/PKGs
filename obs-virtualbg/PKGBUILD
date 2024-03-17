@@ -1,0 +1,26 @@
+# Maintainer: Naoya Hayashi <fuzakebito.fuzake.io>
+pkgname=obs-virtualbg
+pkgver=v1.2.0.r13.0b5e8e8
+pkgrel=1
+pkgdesc="An OBS plugin for Zoom/Meet-like virtual background feature."
+_source="${pkgname}-${pkgver}"
+arch=("x86_64")
+url="https://github.com/kounoike/obs-virtualbg"
+license=('MIT')
+depends=('onnxruntime')
+makedepends=('git' 'cmake')
+source=("git+https://github.com/kounoike/obs-virtualbg.git")
+md5sums=('SKIP')
+pkgver() {
+  cd "$srcdir/${pkgname%-git}"
+  printf "%s" "$(git describe --tags --long | sed 's/\([^-]*-\)g/r\1/;s/-/./g')"
+}
+build() {
+  cd "$pkgname"
+  cmake -B build
+  cmake --build build
+}
+package() {
+  cd "$pkgname"
+  cmake --install build --prefix "$pkgdir/usr"
+}
