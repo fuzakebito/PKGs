@@ -22,17 +22,20 @@ prepare() {
 # setup cups-directories
 	install -dm755 "$srcdir/usr/share/cups/model"
 	install -dm755 "$srcdir/usr/lib/cups/filter"
-# copy ppd and filter file to their destination dirs
-        cd `find . -type d -name 'cupswrapper'`
-        cp *lpdwrapper* "$srcdir/usr/lib/cups/filter/"
-        cp *.ppd "$srcdir/usr/share/cups/model/"
-# set the basedir to an absolute path in the perl-lpdwrapper-script
-# the relative path,generated on the basis of the caller, does not work in this case
+# link ppd and filter file to their destination dirs
         cd "$srcdir"
-# get absolute printer path
-        _baseDir="\"/$(find opt -maxdepth 3 -depth -print -quit -type d)\""
-# replace the dynamic basedir var with the absolute path
-        sed -i "s|\`readlink\ \$0\`|$_baseDir|" $srcdir/usr/lib/cups/filter/*lpdwrapper*
+        cupswrapperdir=`find . -type d -name 'cupswrapper'`
+        lpdwrapper=`find $cupswrapperdir -type f -name '*lpdwrapper*' | sed -e "s/^\.//"`
+        ppd=`find $cupswrapperdir -type f -name '*.ppd' | sed -e "s/^\.//"`
+        ln -sf $lpdwrapper "$srcdir/usr/lib/cups/filter/`basename $lpdwrapper`"
+        ln -sf $ppd "$srcdir/usr/share/cups/model/`basename $ppd`"
+# link brprintconf and brfilter
+        lpddir=`find . -type d -name 'lpd'`
+        brprintconf=`find "$lpddir/$CARCH" -type f -name 'brprintconf*' | sed -e "s/^\.//"`
+        brfilter=`find "$lpddir/$CARCH" -type f -name 'br*filter' | sed -e "s/^\.//"`
+        ln -sf $brprintconf "$lpddir/`basename $brprintconf`"
+        ln -sf $brfilter "$lpddir/`basename $brfilter`"
+        ln -sf $brprintconf "$srcdir/usr/lib/cups/filter/`basename $brprintconf`"
 # /etc/printcap is managed by cups
         rm "$(find $srcdir -type f -name 'setupPrintcap*')"
 }
