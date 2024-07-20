@@ -7,8 +7,6 @@ arch=("i686" "x86_64")
 url="https://support.brother.co.jp/j/b/producttop.aspx?prod=dcpj926n"
 license=('EULA')
 depends=('cups')
-depends_x86_64=('lib32-glibc')
-optdepends=('brscan4: scanner support')
 source=("https://download.brother.com/welcome/dlf105363/dcpj926npdrv-3.5.0-1.i386.rpm")
 sha256sums=("8ae520dceca16344ee96ca29422b151ea8382bddf5e8b3e1ec811cc186496863")
 prepare() {
