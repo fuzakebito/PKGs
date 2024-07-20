@@ -13,34 +13,33 @@ source=("https://download.brother.com/welcome/dlf105363/dcpj926npdrv-3.5.0-1.i38
 sha256sums=("8ae520dceca16344ee96ca29422b151ea8382bddf5e8b3e1ec811cc186496863")
 prepare() {
 #  do not install in '/usr/local'
-	if [ -d $srcdir/usr/local/Brother ]; then
-		install -dm755 "$srcdir/usr/share"
-		mv "$srcdir/usr/local/Brother/" "$srcdir/usr/share/brother"
-		rm -rf "$srcdir/usr/local"
-	        sed -i 's|/usr/local/Brother|/usr/share/brother|g' `grep -lr '/usr/local/Brother' ./`
-        fi
+  if [ -d $srcdir/usr/local/Brother ]; then
+    install -dm755 "$srcdir/usr/share"
+    mv "$srcdir/usr/local/Brother/" "$srcdir/usr/share/brother"
+    rm -rf "$srcdir/usr/local"
+    sed -i 's|/usr/local/Brother|/usr/share/brother|g' `grep -lr '/usr/local/Brother' ./`
+  fi
 # setup cups-directories
-	install -dm755 "$srcdir/usr/share/cups/model"
-	install -dm755 "$srcdir/usr/lib/cups/filter"
+  install -dm755 "$srcdir/usr/share/cups/model"
+  install -dm755 "$srcdir/usr/lib/cups/filter"
 # link ppd and filter file to their destination dirs
-        cd "$srcdir"
-        cupswrapperdir=`find . -type d -name 'cupswrapper'`
-        lpdwrapper=`find $cupswrapperdir -type f -name '*lpdwrapper*' | sed -e "s/^\.//"`
-        ppd=`find $cupswrapperdir -type f -name '*.ppd' | sed -e "s/^\.//"`
-        ln -sf $lpdwrapper "$srcdir/usr/lib/cups/filter/`basename $lpdwrapper`"
-        ln -sf $ppd "$srcdir/usr/share/cups/model/`basename $ppd`"
+  cd "$srcdir"
+  cupswrapperdir=`find . -type d -name 'cupswrapper'`
+  lpdwrapper=`find $cupswrapperdir -type f -name '*lpdwrapper*' | sed -e "s/^\.//"`
+  ppd=`find $cupswrapperdir -type f -name '*.ppd' | sed -e "s/^\.//"`
+  ln -sf $lpdwrapper "$srcdir/usr/lib/cups/filter/`basename $lpdwrapper`"
+  ln -sf $ppd "$srcdir/usr/share/cups/model/`basename $ppd`"
 # link brprintconf and brfilter
-        lpddir=`find . -type d -name 'lpd'`
-        brprintconf=`find "$lpddir/$CARCH" -type f -name 'brprintconf*' | sed -e "s/^\.//"`
-        brfilter=`find "$lpddir/$CARCH" -type f -name 'br*filter' | sed -e "s/^\.//"`
-        ln -sf $brprintconf "$lpddir/`basename $brprintconf`"
-        ln -sf $brfilter "$lpddir/`basename $brfilter`"
-        ln -sf $brprintconf "$srcdir/usr/lib/cups/filter/`basename $brprintconf`"
+  lpddir=`find . -type d -name 'lpd'`
+  brprintconf=`find "$lpddir/$CARCH" -type f -name 'brprintconf*' | sed -e "s/^\.//"`
+  brfilter=`find "$lpddir/$CARCH" -type f -name 'br*filter' | sed -e "s/^\.//"`
+  ln -sf $brprintconf "$lpddir/`basename $brprintconf`"
+  ln -sf $brfilter "$lpddir/`basename $brfilter`"
+  ln -sf $brprintconf "$srcdir/usr/lib/cups/filter/`basename $brprintconf`"
 # /etc/printcap is managed by cups
-        rm "$(find $srcdir -type f -name 'setupPrintcap*')"
+  rm "$(find $srcdir -type f -name 'setupPrintcap*')"
 }
 package() {
-    cp -R "$srcdir/usr" "$pkgdir"
-    cp -R "$srcdir/opt" "$pkgdir"
+  cp -R "$srcdir/usr" "$pkgdir"
+  cp -R "$srcdir/opt" "$pkgdir"
 }
-
